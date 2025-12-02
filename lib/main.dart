@@ -5,13 +5,30 @@ void main() => runApp(const MyApp());
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
+  static const Color seedColor = Color(0xFF7B001C); // bordeaux
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Profile & Quizz',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+        colorScheme: ColorScheme.fromSeed(seedColor: seedColor),
         useMaterial3: true,
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: seedColor,
+          foregroundColor: Colors.white,
+          centerTitle: true,
+          elevation: 4,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: seedColor,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        ),
         textTheme: const TextTheme(
           headlineSmall: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
           titleMedium: TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
@@ -30,51 +47,27 @@ class MainMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('TP1 Flutter'), centerTitle: true),
+      appBar: AppBar(title: const Text('TP1 Flutter')),
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            MenuButton(
-              label: 'Exercice 1: Profile Card',
+            ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProfileHomePage()),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const ProfileHomePage()));
               },
+              child: const Text('Exercice 1: Profile Card'),
             ),
             const SizedBox(height: 24),
-            MenuButton(
-              label: 'Exercice 2: Quizz',
+            ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const QuizzPage(title: 'Flutter Quizz')),
-                );
+                Navigator.push(context, MaterialPageRoute(builder: (_) => const QuizzPage(title: 'Flutter Quizz')));
               },
+              child: const Text('Exercice 2: Quizz'),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class MenuButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
-  const MenuButton({required this.label, required this.onPressed, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      child: Text(label, style: const TextStyle(fontSize: 16)),
     );
   }
 }
@@ -84,37 +77,40 @@ class ProfileHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const assetPath = 'assets/images/fadel.png'; // ajouter dans `pubspec.yaml`
+    final seed = MyApp.seedColor;
     return Scaffold(
       appBar: AppBar(title: const Text('Profile Card')),
       body: Container(
         width: double.infinity,
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.indigo.shade400, Colors.indigo.shade50],
+            colors: [seed.withOpacity(0.95), seed.withOpacity(0.12)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
-        alignment: Alignment.topCenter,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16),
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.topCenter,
-            children: [
-              const SizedBox(height: 80),
-              _getCard(context),
-              Positioned(top: -60, child: _getAvatar(context)),
-            ],
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  clipBehavior: Clip.none,
+                  alignment: Alignment.topCenter,
+                  children: [
+                    const SizedBox(height: 60),
+                    _getCard(context),
+                    Positioned(top: -60, child: ProfileAvatar(size: 120, assetPath: assetPath)),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
-  }
-
-  Widget _getAvatar(BuildContext context) {
-    // Placez votre image locale dans `assets/images/fadel.jpg` et déclarez-la dans `pubspec.yaml`
-    return const ProfileAvatar(size: 120, assetPath: 'assets/images/fadel.jpg');
   }
 
   Widget _getCard(BuildContext context) {
@@ -205,6 +201,8 @@ class ProfileCard extends StatelessWidget {
             const SizedBox(height: 10),
             InfoRow(icon: Icons.alternate_email, label: social),
             const SizedBox(height: 16),
+
+
           ],
         ),
       ),
@@ -263,23 +261,24 @@ class _QuizzPageState extends State<QuizzPage> {
 
   @override
   Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
     return Scaffold(
       appBar: AppBar(title: Text(widget.title)),
       body: Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
-        color: Colors.blueGrey[900],
-        child: _finished ? _resultView() : _questionView(),
+        color: Theme.of(context).colorScheme.background,
+        child: _finished ? _resultView() : _questionView(primary),
       ),
     );
   }
 
-  Widget _questionView() {
+  Widget _questionView(Color primary) {
     final q = _questions[_index];
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Text('Question ${_index + 1} / ${_questions.length}', style: const TextStyle(color: Colors.white70, fontSize: 16)),
+        Text('Question ${_index + 1} / ${_questions.length}', style: TextStyle(color: primary.withOpacity(0.9), fontSize: 16)),
         const SizedBox(height: 24),
         Card(
           color: Colors.white,
@@ -311,7 +310,7 @@ class _QuizzPageState extends State<QuizzPage> {
           ],
         ),
         const SizedBox(height: 20),
-        Text('Score: $_score', style: const TextStyle(color: Colors.white, fontSize: 18)),
+        Text('Score: $_score', style: TextStyle(color: primary.withOpacity(0.9), fontSize: 18)),
       ],
     );
   }
@@ -323,15 +322,15 @@ class _QuizzPageState extends State<QuizzPage> {
       children: [
         const Icon(Icons.emoji_events, size: 96, color: Colors.amber),
         const SizedBox(height: 24),
-        const Text('Quizz Terminé', style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+        const Text('Quizz Terminé', style: TextStyle(color: Colors.black87, fontSize: 28, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        Text('$_score / ${_questions.length}', style: const TextStyle(color: Colors.white, fontSize: 20)),
+        Text('$_score / ${_questions.length}', style: const TextStyle(color: Colors.black87, fontSize: 20)),
         const SizedBox(height: 8),
         Text('${percent.toStringAsFixed(1)} %', style: const TextStyle(color: Colors.amber, fontSize: 22)),
         const SizedBox(height: 24),
         ElevatedButton(
           onPressed: _reset,
-          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14)),
+          style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 36, vertical: 14), backgroundColor: MyApp.seedColor),
           child: const Text('Recommencer'),
         ),
       ],
@@ -353,7 +352,6 @@ class _QuizzPageState extends State<QuizzPage> {
 
     final controller = ScaffoldMessenger.of(context).showSnackBar(snack);
 
-    // Attendre la fermeture du SnackBar avant de changer la question
     await controller.closed;
 
     setState(() {
