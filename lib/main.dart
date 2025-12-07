@@ -5,7 +5,7 @@ void main() => runApp(const MyApp());
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  static const Color seedColor = Color(0xFF7B001C); // bordeaux
+  static const Color seedColor = Color(0xFF7B001C);
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +77,7 @@ class ProfileHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const assetPath = 'assets/images/fadel.png'; // ajouter dans `pubspec.yaml`
+    const assetPath = 'assets/images/fadel.png';
     final seed = MyApp.seedColor;
     return Scaffold(
       appBar: AppBar(title: const Text('Profile Card')),
